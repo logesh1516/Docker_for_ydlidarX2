@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  lidar:
+    image: ydlidarx2:latest
+    command: bash -c "source /opt/ros/humble/setup.bash && \
+                      source /ydlidarX2/install/setup.bash && \
+                      ros2 launch ydlidar_ros2_driver ydlidar_X2_view.launch.py"
+    tty: true
+    privileged: true
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    networks:
+      - ros2
+
+  slam:
+    image: ydlidarx2:latest
+    command: bash -c "source /opt/ros/humble/setup.bash && \
+                      source /ydlidarX2/install/setup.bash && \
+                      ros2 launch slam_gmapping slam_gmapping.launch.py"
+    tty: true
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    networks:
+      - ros2
+
+networks:
+  ros2:
